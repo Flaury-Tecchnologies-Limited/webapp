@@ -1,10 +1,38 @@
+import React, { useState } from "react";
 import vector from "/Vector.svg";
 import heroImg1 from "/hero-img1.png";
 import search from "/search.svg";
 
 const Hero = () => {
+  // Step 1: Temporary popular searches
+  const popularSearches = [
+    "Skin Retouch",
+    "Hair Treatment",
+    "Spa",
+    "Manicure",
+    "Pedicure",
+    "Nail Art",
+    "Facial",
+    "Massage",
+    "Makeup",
+    "Laser Treatment",
+  ];
+
+  // Step 2: State for the search input
+  const [searchInput, setSearchInput] = useState("");
+
+  // Handle search input change
+  const handleSearchChange = (event) => {
+    setSearchInput(event.target.value);
+  };
+
+  // Handle popular search button click
+  const handlePopularSearchClick = (searchTerm) => {
+    setSearchInput(searchTerm); // Set the search term in input field
+  };
+
   return (
-    <div className="h-full w-full  hero-bg px-4 py-4 md:px-28 lg:px-32 md:pt-32">
+    <div className="h-full w-full hero-bg px-4 py-4 md:px-28 lg:px-32 md:pt-32">
       <div className="max-w-[1200px] mx-auto flex justify-between items-center">
         <div className="w-full md:w-1/2 mt-20 md:mt-0">
           <h3 className="text-sm md:text-lg text-white p-2">
@@ -25,6 +53,8 @@ const Hero = () => {
                 type="text"
                 name="search"
                 id="search"
+                value={searchInput} // Bind the search input value to the state
+                onChange={handleSearchChange} // Update state on input change
                 placeholder="Search for a service"
                 className="border-r border-r-lightPrimaryColor w-full px-4 py-2 text-sm text-lightPrimaryColor placeholder-lightPrimaryColor"
               />
@@ -36,19 +66,19 @@ const Hero = () => {
 
           <div className="flex gap-4 items-center mt-6">
             <h3 className="text-white text-sm">Popular:</h3>
-            <ul className="w-[20rem] overflow-x-auto flex gap-4">
-              <button className="border text-xs px-2 py-1 rounded-lg text-white">
-                Skin Retouch
-              </button>
-              <button className="border text-xs px-2 py-1 rounded-lg text-white">
-                Hair Treatment
-              </button>
-              <button className="border text-xs px-2 py-1 rounded-lg text-white">
-                Spa
-              </button>
-              <button className="border text-xs px-2 py-1 rounded-lg text-white">
-                Menicure
-              </button>
+            <ul className="w-[20rem] md:w-fit overflow-x-auto md:overflow-x-hidden flex gap-4 md:gap-2">
+              {/* Step 3: Dynamically display popular searches based on screen size */}
+              {popularSearches
+                .slice(0, window.innerWidth <= 768 ? 10 : 5)
+                .map((searchTerm, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handlePopularSearchClick(searchTerm)} // Set input on click
+                    className="border text-xs px-2 md:px-4 py-1 rounded-lg text-white"
+                  >
+                    {searchTerm}
+                  </button>
+                ))}
             </ul>
           </div>
         </div>
