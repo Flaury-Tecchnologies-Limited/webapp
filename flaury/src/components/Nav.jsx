@@ -122,7 +122,7 @@ const Nav = () => {
                   <Button
                     title="Sign Up"
                     onClick={() => navigate("/choose-role")}
-                    customClasses="px-8 py-3"
+                    customClasses="px-4 py-3 mb-2"
                   />
                 </li>
                 <li>

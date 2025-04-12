@@ -4,7 +4,6 @@ import heroImg1 from "/hero-img1.png";
 import search from "/search.svg";
 
 const Hero = () => {
-  // Step 1: Temporary popular searches
   const popularSearches = [
     "Skin Retouch",
     "Hair Treatment",
@@ -17,16 +16,12 @@ const Hero = () => {
     "Makeup",
     "Laser Treatment",
   ];
-
-  // Step 2: State for the search input
   const [searchInput, setSearchInput] = useState("");
 
-  // Handle search input change
   const handleSearchChange = (event) => {
     setSearchInput(event.target.value);
   };
 
-  // Handle popular search button click
   const handlePopularSearchClick = (searchTerm) => {
     setSearchInput(searchTerm); // Set the search term in input field
   };
@@ -67,7 +62,7 @@ const Hero = () => {
           <div className="flex gap-4 items-center mt-6">
             <h3 className="text-white text-sm">Popular:</h3>
             <ul className="w-[20rem] md:w-fit overflow-x-auto md:overflow-x-hidden flex gap-4 md:gap-2">
-              {/* Step 3: Dynamically display popular searches based on screen size */}
+              {/* Dynamically display popular searches based on screen size */}
               {popularSearches
                 .slice(0, window.innerWidth <= 768 ? 10 : 5)
                 .map((searchTerm, index) => (
