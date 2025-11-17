@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import BBooking from "@/components/bookings/BBooking";
 import CBooking from "@/components/bookings/CBooking";
@@ -126,13 +127,14 @@ const Bookings = () => {
   const bookService = () => {
     navigate("/bookings-flow");
   };
-  const roleData = localStorage.getItem("userData");
+  const { user } = useAuth();
+  const role = user?.role;
 
   return (
     <DashboardLayout>
       <div className="flex gap-8 text-primary">
         <div className="flex flex-col lg:flex-row gap-8 text-primary">
-          {roleData === "business" ? (
+          {(role === "business" || role === "service_provider") ? (
             <BBooking />
           ) : (
             <CBooking salonData={salonData} confirmOrders={confirmOrders} />

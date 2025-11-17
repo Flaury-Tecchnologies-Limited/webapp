@@ -32,17 +32,6 @@ const BQuickLink = () => {
   const { user } = useAuth();
   const displayName = useMemo(() => {
     if (!user) {
-      if (typeof window !== "undefined") {
-        const stored = window.localStorage.getItem("FLYuserData");
-        if (stored) {
-          try {
-            const parsed = JSON.parse(stored);
-            return parsed?.name || parsed?.username || "there";
-          } catch (err) {
-            console.warn("Unable to parse stored user data", err);
-          }
-        }
-      }
       return "there";
     }
     return user.name || user.username || "there";

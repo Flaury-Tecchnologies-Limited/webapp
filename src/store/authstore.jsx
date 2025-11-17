@@ -33,7 +33,7 @@ export const useAuthStore = create(
         typeof window !== "undefined" ? window.innerWidth <= 900 : false,
       token:
         typeof window !== "undefined"
-          ? localStorage.getItem("token") || null
+          ? localStorage.getItem("accessToken") || localStorage.getItem("token") || null
           : null,
 
       // Registration flow state

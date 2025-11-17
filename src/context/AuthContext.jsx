@@ -17,7 +17,9 @@ const AuthContextProvider = ({ children }) => {
   const fetchUserDetails = async () => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
-      setUser(null); // no token → user is out
+      // If there's no token, don't overwrite a hydrated user (dev/local-stored)
+      // just stop the fetch and clear the loading flag. This avoids wiping
+      // a user that was set manually in localStorage for development.
       setIsLoading(false);
       return;
     }
@@ -39,11 +41,25 @@ const AuthContextProvider = ({ children }) => {
       if (!json?.data?.user) throw new Error("Malformed response");
 
       setUser(json.data.user);
-      localStorage.setItem("FLYuserData", JSON.stringify(json.data.user));
+      // Persist user in multiple common keys for backward compatibility across the app
+      try {
+        localStorage.setItem("FLYuserData", JSON.stringify(json.data.user));
+        localStorage.setItem("userInfo", JSON.stringify(json.data.user));
+        // some components expect `userData` or `roleData` as separate values
+        localStorage.setItem("userData", JSON.stringify(json.data.user));
+        localStorage.setItem("roleData", json.data.user.role || "");
+      } catch (e) {
+        // ignore if localStorage is unavailable
+      }
     } catch (err) {
       console.log("Error fetching user details:", err);
       setUser(null);
-      localStorage.removeItem("FLYuserData"); // clear invalid data
+      try {
+        localStorage.removeItem("FLYuserData"); // clear invalid data
+        localStorage.removeItem("userInfo");
+        localStorage.removeItem("userData");
+        localStorage.removeItem("roleData");
+      } catch (e) {}
     } finally {
       setIsLoading(false);
     }
@@ -65,7 +81,11 @@ const AuthContextProvider = ({ children }) => {
     fetchUserDetails();
 
     const handleStorageChange = (event) => {
-      if (event.key === "FLYuserData" && localStorage.getItem("accessToken")) {
+      // If user data or token changed in another tab, refresh the user
+      if (
+        (event.key === "FLYuserData" || event.key === "userInfo" || event.key === "accessToken") &&
+        localStorage.getItem("accessToken")
+      ) {
         fetchUserDetails();
       }
     };
@@ -76,15 +96,28 @@ const AuthContextProvider = ({ children }) => {
 
   // load user from storage on mount
   useEffect(() => {
-    const storedUser = localStorage.getItem("FLYuserData");
-    if (storedUser) setUser(JSON.parse(storedUser));
+    // Try to hydrate user from any known storage key for faster UI render
+    const storedUser =
+      localStorage.getItem("FLYuserData") || localStorage.getItem("userInfo") || localStorage.getItem("userData");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        // If storedUser is a string role or malformed, ignore
+      }
+    }
     setIsLoading(false);
   }, []);
 
   // logout clears everything and resets states
   const logOut = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("FLYuserData");
+    try {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("FLYuserData");
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("userData");
+      localStorage.removeItem("roleData");
+    } catch (e) {}
     setUser(null);
     setIsLoading(false);
     window.location.href = "/login";
@@ -94,6 +127,7 @@ const AuthContextProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
+        role: user?.role || null,
         allUser,
         loading,
         isLoading,

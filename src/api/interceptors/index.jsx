@@ -3,7 +3,8 @@ import errorInterceptor from "./error";
 const setupInterceptors = (axiosInstance) => {
   axiosInstance.interceptors.request.use(
     (config) => {
-      const token = localStorage.getItem("token");
+      // Prefer the standardized accessToken key, fall back to older 'token' for compatibility
+      const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }

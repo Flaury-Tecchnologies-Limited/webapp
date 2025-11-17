@@ -1,15 +1,16 @@
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import forwardarrow from "/forwardarrow.svg";
 import BusinessInfoForm from "./BusinessInfoForm";
 
 const SettingsComponent = () => {
   const [page, setPage] = useState("");
-  const roleData = localStorage.getItem("roleData")
+  const { role } = useAuth();
   return (
     <div>
       {page === "edit-profile" ? (
         <div>
-          {roleData === "service_provider" ? (
+          {role === "service_provider" ? (
             <>
               <div
                 className="bg-white w-full rounded-md shadow-xl mb-4 flex justify-between cursor-pointer p-4"

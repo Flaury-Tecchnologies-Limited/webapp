@@ -103,7 +103,8 @@ const SignUp = () => {
         const response = result.data;
 
         if (response?.token) {
-          localStorage.setItem("token", response.token);
+          // store under standardized key
+          localStorage.setItem("accessToken", response.token);
         }
 
         if (response?.user) {

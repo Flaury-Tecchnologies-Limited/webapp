@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useAuth } from "@/context/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import ProfileDetailsItem from "./ProfileDetailsItem";
 import HelpComponent from "./HelpComponent";
@@ -103,14 +104,12 @@ const ProfileComponent = () => {
   const handleComingSoon = () => {
     setShowComingSoon(true);
   };
-  const onLogout = () => {
-    navigate("/");
-    localStorage.removeItem("userData");
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("roleData");
-  };
+  const { logOut, role } = useAuth();
 
-  const roleData = localStorage.getItem("roleData");
+  const onLogout = () => {
+    // use centralized logout
+    logOut();
+  };
 
   return (
     <div className="mb-10">

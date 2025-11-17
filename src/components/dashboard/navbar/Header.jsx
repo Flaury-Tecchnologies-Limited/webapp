@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useAuth } from "@/context/AuthContext"
 import { Bell, Search, Settings, Heart } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { useForm } from "react-hook-form";
@@ -15,7 +16,8 @@ const MainNav = () => {
   const onSubmit = () => {
     setShowPopup(false);
   };
-  const roleData = localStorage.getItem("userData");
+  const { user } = useAuth();
+  const roleData = user?.role;
 
   return (
     <div className="w-full py-3">
@@ -56,10 +58,12 @@ const MainNav = () => {
             <Settings className="h-6 w-6" />
           </Link>
 
-          {/* Favorites */}
-          <Link to="/favorites" className="rounded-full text-primary hover:bg-gray-100">
-            <Heart className="h-6 w-6" />
-          </Link>
+          {/* Favorites - hide for service providers */}
+          {roleData !== "service_provider" && roleData !== "business" && (
+            <Link to="/favorites" className="rounded-full text-primary hover:bg-gray-100">
+              <Heart className="h-6 w-6" />
+            </Link>
+          )}
 
           {/* User Profile */}
           {/* <div className="flex items-center space-x-2">

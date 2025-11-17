@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useAuth } from "@/context/AuthContext"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import logo from "/logo-white.svg"
 import dashboard from "/dashboard.svg"
@@ -17,16 +18,25 @@ const DashboardLayout = ({ children }) => {
   const location = useLocation()
   const navigate = useNavigate()
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [userData, setUserData] = useState(null)
+  const { user, logOut } = useAuth()
 
-  // Navigation items for both sidebar and mobile nav
-  const navigationItems = [
-    { path: "/dashboard", icon: dashboard, label: "Dashboard" },
-    { path: "/bookings", icon: booking, label: "Bookings" },
-    { path: "/chat", icon: chat, label: "Chat" },
-    { path: "/favorites", icon: favorite, label: "Favorites" },
-    { path: "/profile", icon: profile, label: "Profile" },
-  ]
+  // Navigation items: default for customers includes Favorites.
+  // For service providers we only show the simplified set (as requested):
+  // Dashboard, Bookings, Chat, Profile
+  const navigationItems = user?.role === "service_provider"
+    ? [
+        { path: "/dashboard", icon: dashboard, label: "Dashboard" },
+        { path: "/bookings", icon: booking, label: "Bookings" },
+        { path: "/chat", icon: chat, label: "Chat" },
+        { path: "/profile", icon: profile, label: "Profile" },
+      ]
+    : [
+        { path: "/dashboard", icon: dashboard, label: "Dashboard" },
+        { path: "/bookings", icon: booking, label: "Bookings" },
+        { path: "/chat", icon: chat, label: "Chat" },
+        { path: "/favorites", icon: favorite, label: "Favorites" },
+        { path: "/profile", icon: profile, label: "Profile" },
+      ]
 
   // Set sidebar open on LG screens, close on smaller screens
   useEffect(() => {
@@ -43,17 +53,7 @@ const DashboardLayout = ({ children }) => {
     }
   }, [])
 
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const userInfoData = localStorage.getItem("userInfo")
-      if (userInfoData) {
-        const parsedUserInfoResponse = JSON.parse(userInfoData)
-        setUserData(parsedUserInfoResponse)
-      }
-    }
-
-    fetchUserData()
-  }, [])
+  // user is obtained from AuthContext; no need to read from localStorage here.
 
   // Close mobile nav when route changes
   useEffect(() => {
@@ -65,10 +65,8 @@ const DashboardLayout = ({ children }) => {
   }
 
   const handleLogout = () => {
-    navigate("/")
     closeModal()
-    localStorage.removeItem("accessToken")
-    localStorage.removeItem("userInfo")
+    logOut()
   }
 
   const toggleSidebar = () => {
@@ -129,25 +127,25 @@ const DashboardLayout = ({ children }) => {
             })}
           </ul>
 
-          {userData && (
+          {user && (
             <div className="absolute bottom-0 left-0 right-0 p-4">
               <div className="flex items-center p-3 space-x-3 bg-white/10 rounded-lg">
                 <div className="w-10 h-10 bg-white/20 rounded-full overflow-hidden">
-                  {userData.profilePicture ? (
+                  {user.profilePicture ? (
                     <img
-                      src={userData.profilePicture || "/placeholder.svg"}
+                      src={user.profilePicture || "/placeholder.svg"}
                       alt="Profile"
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="flex items-center justify-center w-full h-full text-lg font-medium">
-                      {userData.name?.charAt(0) || "U"}
+                      {user.name?.charAt(0) || "U"}
                     </div>
                   )}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{userData.name || "User"}</p>
-                  <p className="text-xs text-white/70 truncate">{userData.email || ""}</p>
+                  <p className="text-sm font-medium truncate">{user.name || "User"}</p>
+                  <p className="text-xs text-white/70 truncate">{user.email || ""}</p>
                 </div>
               </div>
             </div>

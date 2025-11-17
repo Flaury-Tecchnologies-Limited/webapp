@@ -5,7 +5,10 @@ import { useAuth } from "@/context/AuthContext";
 
 const DashboardMain = () => {
   const { user, isLoading } = useAuth();
-  const [role, setRole] = useState(() => localStorage.getItem("roleData"));
+
+  // Use role from the auth context as the single source of truth.
+  // Initialize as null to indicate "not yet known".
+  const [role, setRole] = useState(null);
 
   useEffect(() => {
     if (user?.role) {
@@ -13,7 +16,8 @@ const DashboardMain = () => {
     }
   }, [user]);
 
-  if (isLoading && !role) {
+  // While auth is loading and we don't yet know the role, show a loader.
+  if (isLoading && role === null) {
     return (
       <div className="flex h-screen items-center justify-center text-primary">
         Loading dashboard...

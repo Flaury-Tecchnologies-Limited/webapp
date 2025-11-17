@@ -9,6 +9,8 @@ import haircut from "/haircut.png";
 import massage from "/massage.png";
 import perfume from "/perfume.png";
 import { Switch } from "@/components/ui/switch";
+import { useAuth } from "@/context/AuthContext";
+import BBooking from "@/components/bookings/BBooking";
 
 const bookings = [
   {
@@ -54,6 +56,8 @@ const bookings = [
 ];
 
 export default function BookingManagement() {
+  const { user } = useAuth();
+  const role = user?.role;
   const [activeTab, setActiveTab] = useState("Upcoming");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -100,6 +104,15 @@ export default function BookingManagement() {
   const handleCloseSuccessModal = () => {
     setShowSuccessModal(false);
   };
+
+  // If user is a service provider, show the provider bookings view
+  if (role === "service_provider" || role === "business") {
+    return (
+      <DashboardLayout>
+        <BBooking />
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout>

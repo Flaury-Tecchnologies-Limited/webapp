@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 import ProfileDetailsItem from "./ProfileDetailsItem";
 
 const PaymentComponent = () => {
@@ -6,7 +7,7 @@ const PaymentComponent = () => {
   const [page, setPage] = useState("");
   const [profileDetails, setProfileDetails] = useState([]);
   const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const roleData = localStorage.getItem("roleData");
+  const { role } = useAuth();
 
   const deletePopup = () => {
     setShowDeletePopup(true);
@@ -40,7 +41,7 @@ const PaymentComponent = () => {
 
   return (
     <>
-      {roleData === "service_provider" ? (
+  {role === "service_provider" ? (
         <>
           {profileDetails.map((profileDetail) => (
             <ProfileDetailsItem
